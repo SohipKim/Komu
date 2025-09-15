@@ -12,9 +12,10 @@ import {
 } from "lucide-react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { AppScreen } from "../../../../Commu Final Ver. (explore)/src/App";
 
 interface HomeDashboardProps {
-  onNavigate: (screen: string) => void;
+  onNavigate: (screen: AppScreen) => void;
   onViewContributions: () => void;
   onViewCommuNotes: () => void;
   onCreateCleaningPlan: () => void;
