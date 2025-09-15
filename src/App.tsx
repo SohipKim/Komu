@@ -5,17 +5,21 @@ import { SignUpScreen } from './components/SignUpScreen';
 import { JoinHouseStep1 } from './components/JoinHouseStep1';
 import { JoinHouseStep2 } from './components/JoinHouseStep2';
 import { JoinHouseLoading } from './components/JoinHouseLoading';
-import { WelcomeScreen } from './components/WelcomeScreen';
-import { CleaningStyleIntro } from './components/CleaningStyleIntro';
-import { CleaningStyleQuestion } from './components/CleaningStyleQuestion';
-import { ConflictTriggerQuestion } from './components/ConflictTriggerQuestion';
-import { CleaningPriorityQuestion } from './components/CleaningPriorityQuestion';
-import { QuestionComplete } from './components/QuestionComplete';
+import { OnboardingFlow } from './components/OnboardingFlow';
 import { HomeDashboard } from './components/HomeDashboard';
 import { WelcomeInvitee } from './components/WelcomeInvitee';
 import { CleaningPlanSize } from './components/CleaningPlanSize';
 import { ContributionHistory } from './components/ContributionHistory';
 import { ContributionFeedback } from './components/ContributionFeedback';
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  cleaningStyle: string;
+  conflictTriggers: string[];
+  cleaningPriorities: string[];
+  personalReport?: string;
+}
 
 type AppScreen = 
   | 'entry'
@@ -24,12 +28,7 @@ type AppScreen =
   | 'join-house-step1'
   | 'join-house-step2'
   | 'join-house-loading'
-  | 'welcome'
-  | 'cleaning-style-intro'
-  | 'cleaning-style' 
-  | 'conflict-trigger'
-  | 'cleaning-priority'
-  | 'question-complete'
+  | 'onboarding'
   | 'home'
   | 'welcome-invitee'
   | 'cleaning-plan-size'
@@ -39,18 +38,15 @@ type AppScreen =
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<AppScreen>('entry');
   const [entryCode, setEntryCode] = useState('');
-  const [userAnswers, setUserAnswers] = useState({
-    cleaningStyle: '',
-    conflictTrigger: '',
-    cleaningPriority: ''
-  });
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   const navigateTo = (screen: AppScreen) => {
     setCurrentScreen(screen);
   };
 
-  const updateAnswer = (key: string, value: string) => {
-    setUserAnswers(prev => ({ ...prev, [key]: value }));
+  const handleOnboardingComplete = (profile: UserProfile) => {
+    setUserProfile(profile);
+    navigateTo('home');
   };
 
   const renderScreen = () => {
@@ -85,14 +81,14 @@ export default function App() {
       case 'join-house-loading':
         return (
           <JoinHouseLoading 
-            onComplete={() => navigateTo('welcome')}
+            onComplete={() => navigateTo('onboarding')}
           />
         );
       case 'login':
         return (
           <LogInScreen 
             onBack={() => navigateTo('entry')}
-            onLogIn={() => navigateTo('welcome')}
+            onLogIn={() => navigateTo('onboarding')}
             onForgotPassword={() => {/* Handle forgot password */}}
           />
         );
@@ -100,51 +96,17 @@ export default function App() {
         return (
           <SignUpScreen 
             onBack={() => navigateTo('entry')}
-            onSignUp={() => navigateTo('welcome')}
+            onSignUp={() => navigateTo('onboarding')}
             onSignIn={() => navigateTo('login')}
           />
         );
-      case 'welcome':
-        return <WelcomeScreen onNext={() => navigateTo('cleaning-style-intro')} />;
-      case 'cleaning-style-intro':
+      case 'onboarding':
         return (
-          <CleaningStyleIntro 
-            onStart={() => navigateTo('cleaning-style')}
-            onBack={() => navigateTo('welcome')}
+          <OnboardingFlow 
+            onComplete={handleOnboardingComplete}
+            onBack={() => navigateTo('entry')}
           />
         );
-      case 'cleaning-style':
-        return (
-          <CleaningStyleQuestion 
-            onNext={(value) => {
-              updateAnswer('cleaningStyle', value);
-              navigateTo('conflict-trigger');
-            }}
-            onBack={() => navigateTo('cleaning-style-intro')}
-          />
-        );
-      case 'conflict-trigger':
-        return (
-          <ConflictTriggerQuestion 
-            onNext={(value) => {
-              updateAnswer('conflictTrigger', value);
-              navigateTo('cleaning-priority');
-            }}
-            onBack={() => navigateTo('cleaning-style')}
-          />
-        );
-      case 'cleaning-priority':
-        return (
-          <CleaningPriorityQuestion 
-            onNext={(value) => {
-              updateAnswer('cleaningPriority', value);
-              navigateTo('question-complete');
-            }}
-            onBack={() => navigateTo('conflict-trigger')}
-          />
-        );
-      case 'question-complete':
-        return <QuestionComplete onNext={() => navigateTo('home')} />;
       case 'home':
         return (
           <HomeDashboard 
@@ -163,7 +125,12 @@ export default function App() {
       case 'commu-notes':
         return <ContributionFeedback onBack={() => navigateTo('home')} />;
       default:
-        return <WelcomeScreen onNext={() => navigateTo('cleaning-style')} />;
+        return (
+          <OnboardingFlow 
+            onComplete={handleOnboardingComplete}
+            onBack={() => navigateTo('entry')}
+          />
+        );
     }
   };
 
