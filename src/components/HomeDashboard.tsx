@@ -422,7 +422,7 @@ export function HomeDashboard({
               />
 
               {/* Legend with Draggable Hearts */}
-              <div className="flex justify-center space-x-8 mb-4">
+              <div className="flex flex-col items-center space-y-4 mb-4">
                 {contributors.map((contributor) => (
                   <div
                     key={contributor.name}
@@ -441,6 +441,17 @@ export function HomeDashboard({
                     </div>
                   </div>
                 ))}
+              </div>
+
+              {/* Invite a Roommate Button (moved below the legend) */}
+              <div className="flex justify-center mb-4">
+                <Button
+                  variant="outline"
+                  className="w-full max-w-sm border-dashed border-2 text-muted-foreground hover:border-primary hover:text-primary"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Invite a roommate
+                </Button>
               </div>
 
               {/* Timeframe */}
@@ -536,14 +547,7 @@ export function HomeDashboard({
                   ))}
                 </div>
 
-                {/* Invite a Roommate Button */}
-                <Button
-                  variant="outline"
-                  className="w-full border-dashed border-2 text-muted-foreground hover:border-primary hover:text-primary"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Invite a roommate
-                </Button>
+                
               </div>
             </div>
           </div>
